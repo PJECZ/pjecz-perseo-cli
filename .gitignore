@@ -1,0 +1,13 @@
+*.csv
+*.egg-info/
+*.log
+*.py[cod]
+.directory
+.DS_STORE
+__pycache__/
+/credentials.json
+/token.json
+/venv/
+/.bashrc
+/.venv
+/.env
