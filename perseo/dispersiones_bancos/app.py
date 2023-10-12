@@ -1,5 +1,5 @@
 """
-Dispersiones - Bancos
+Dispersiones Bancos
 """
 import rich
 import typer

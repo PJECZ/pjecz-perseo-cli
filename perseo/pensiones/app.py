@@ -1,5 +1,5 @@
 """
-Dispersiones - Pensiones
+Pensiones
 """
 import rich
 import typer
