@@ -6,6 +6,7 @@ import typer
 
 from config.settings import get_settings
 from lib.exceptions import MyAnyError
+from perseo.dispersiones_bancos.searchers import buscar_rfc
 
 app = typer.Typer()
 
