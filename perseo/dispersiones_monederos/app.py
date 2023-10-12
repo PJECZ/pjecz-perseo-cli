@@ -1,5 +1,5 @@
 """
-Dispersiones - Monederos
+Dispersiones Monederos
 """
 import rich
 import typer
