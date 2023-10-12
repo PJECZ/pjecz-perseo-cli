@@ -19,6 +19,10 @@ class MyConnectionError(MyAnyError):
     """Excepcion porque falla la comunicacion o no llega la respuesta"""
 
 
+class MyFileNotFoundError(MyAnyError):
+    """Excepcion porque no existe el archivo"""
+
+
 class MyNoDataWarning(MyAnyError):
     """Excepcion porque lo que llega no es lo esperado"""
 
