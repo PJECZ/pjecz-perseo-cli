@@ -16,3 +16,10 @@ def safe_rfc(input_str: str) -> str:
     if re.fullmatch(RFC_REGEXP, final) is None:
         raise ValueError("RFC es incorrecto")
     return final
+
+
+def safe_string(input_str: str) -> str:
+    """Safe String"""
+    new_string = input_str.strip().upper()
+    removed_multiple_spaces = re.sub(r"\s+", " ", new_string)
+    return unidecode(removed_multiple_spaces)
