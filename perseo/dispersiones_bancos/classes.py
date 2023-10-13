@@ -7,12 +7,13 @@ from perseo.conceptos.classes import Concepto
 from perseo.personas.classes import Persona
 
 
-class PercepcionDescuento(BaseModel):
-    """Percepcion o Descuento"""
+class PercepcionDeduccion(BaseModel):
+    """Percepcion o Deduccion"""
 
-    codigo: str
     concepto: Concepto
     importe: float
+    desde: str
+    hasta: str
 
 
 class Dispersion(BaseModel):
@@ -23,4 +24,4 @@ class Dispersion(BaseModel):
     deduccion: float
     importe: float
     num_cheque: int
-    # percepcion_descuento: list(PercepcionDescuento) = []
+    percepciones_deducciones: list[PercepcionDeduccion] = []
