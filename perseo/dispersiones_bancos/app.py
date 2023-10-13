@@ -28,38 +28,40 @@ def buscar(rfc: str):
 
     # Buscar RFC
     try:
-        dispersion = buscar_rfc(settings=settings, rfc=rfc)
+        dispersiones = buscar_rfc(settings=settings, rfc=rfc)
     except MyAnyError as error:
         typer.secho(str(error), fg=typer.colors.RED)
         raise typer.Exit()
 
-    # Mostrar resultado
-    rich.print(f"Centro de trabajo: [green]{dispersion.persona.centro_trabajo_clave}[/green]")
-    rich.print(f"RFC:               [green]{dispersion.persona.rfc}[/green]")
-    rich.print(f"Nombre:            [green]{dispersion.persona.nombre}[/green]")
-    rich.print(f"Municipio:         [green]{dispersion.persona.municipio.nombre}[/green]")
-    rich.print(f"Plaza:             [green]{dispersion.persona.plaza}[/green]")
-    rich.print(f"Sexo:              [white]{dispersion.persona.sexo}[/white]")
-    rich.print()
+    # Bucle para mostrar las dispersiones
+    for dispersion in dispersiones:
+        # Mostrar resultado
+        rich.print(f"Centro de trabajo: [green]{dispersion.persona.centro_trabajo_clave}[/green]")
+        rich.print(f"RFC:               [green]{dispersion.persona.rfc}[/green]")
+        rich.print(f"Nombre:            [green]{dispersion.persona.nombre}[/green]")
+        rich.print(f"Municipio:         [green]{dispersion.persona.municipio.nombre}[/green]")
+        rich.print(f"Plaza:             [green]{dispersion.persona.plaza}[/green]")
+        rich.print(f"Sexo:              [white]{dispersion.persona.sexo}[/white]")
+        rich.print()
 
-    # Mostrar percepciones
-    for percepcion in dispersion.percepciones_deducciones:
-        if percepcion.concepto.p_d.value == "P":
-            rich.print(f"{percepcion.concepto.descripcion}: [green]{percepcion.importe}[/green]")
-    rich.print()
+        # Mostrar percepciones
+        for percepcion in dispersion.percepciones_deducciones:
+            if percepcion.concepto.p_d.value == "P":
+                rich.print(f"{percepcion.concepto.descripcion}: [green]{percepcion.importe}[/green]")
+        rich.print()
 
-    # Mostrar deducciones
-    for percepcion in dispersion.percepciones_deducciones:
-        if percepcion.concepto.p_d.value == "D":
-            rich.print(f"{percepcion.concepto.descripcion}: [red]{percepcion.importe}[/red]")
-    rich.print()
+        # Mostrar deducciones
+        for percepcion in dispersion.percepciones_deducciones:
+            if percepcion.concepto.p_d.value == "D":
+                rich.print(f"{percepcion.concepto.descripcion}: [red]{percepcion.importe}[/red]")
+        rich.print()
 
-    # Mostrar cantidades finales
-    rich.print(f"Percepcion:        [blue]{dispersion.percepcion}[/blue]")
-    rich.print(f"Deduccion:         [red]{dispersion.deduccion}[/red]")
-    rich.print(f"Importe:           [green]{dispersion.importe}[/green]")
-    rich.print(f"No. Cheque:        [gray]{dispersion.num_cheque}[/gray]")
-    rich.print()
+        # Mostrar cantidades finales
+        rich.print(f"Percepcion:        [blue]{dispersion.percepcion}[/blue]")
+        rich.print(f"Deduccion:         [red]{dispersion.deduccion}[/red]")
+        rich.print(f"Importe:           [green]{dispersion.importe}[/green]")
+        rich.print(f"No. Cheque:        [gray]{dispersion.num_cheque}[/gray]")
+        rich.print()
 
 
 @app.command()
