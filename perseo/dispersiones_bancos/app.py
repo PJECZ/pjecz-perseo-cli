@@ -1,5 +1,5 @@
 """
-Dispersiones Bancos
+Perseo - Dispersiones Bancos
 """
 import rich
 import typer
@@ -27,13 +27,18 @@ def buscar(rfc: str):
 
     # Buscar RFC
     try:
-        resultado = buscar_rfc(settings=settings, rfc=rfc)
+        persona = buscar_rfc(settings=settings, rfc=rfc)
     except MyAnyError as error:
         typer.secho(str(error), fg=typer.colors.RED)
         raise typer.Exit()
 
     # Mostrar resultado
-    rich.print(f"Resultado: [green]{resultado}[/green]")
+    rich.print(f"Centro de trabajo: [green]{persona.centro_trabajo_clave}[/green]")
+    rich.print(f"RFC:               [green]{persona.rfc}[/green]")
+    rich.print(f"Nombre:            [green]{persona.nombre}[/green]")
+    rich.print(f"Municipio:         [green]{persona.municipio}[/green]")
+    rich.print(f"Plaza:             [green]{persona.plaza}[/green]")
+    rich.print(f"Sexo:              [green]{persona.sexo}[/green]")
 
 
 @app.command()
