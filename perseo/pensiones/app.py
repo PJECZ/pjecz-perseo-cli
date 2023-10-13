@@ -1,5 +1,5 @@
 """
-Pensiones
+Perseo - Pensiones
 """
 import rich
 import typer

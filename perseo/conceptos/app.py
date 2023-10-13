@@ -1,5 +1,5 @@
 """
-Conceptos
+Perseo - Conceptos
 """
 import rich
 import typer
