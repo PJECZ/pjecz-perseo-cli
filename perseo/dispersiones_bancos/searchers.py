@@ -15,7 +15,7 @@ from perseo.municipios.loaders import load_municipios
 from perseo.personas.classes import Persona
 
 
-def buscar_rfc(settings: Settings, rfc: str) -> Dispersion:
+def buscar_rfc(settings: Settings, rfc: str) -> list[Dispersion]:
     """Buscar un RFC"""
 
     # Validar RFC
@@ -44,9 +44,10 @@ def buscar_rfc(settings: Settings, rfc: str) -> Dispersion:
     # Obtener la primera hoja
     hoja = libro.sheet_by_index(0)
 
+    # Preparar listados de dispersiones
+    dispersiones = []
+
     # Buscar el RFC en la hoja, donde la columna 2 (comienza en 0) es el RFC
-    dispersion = None
-    persona = None
     for fila in range(hoja.nrows):
         if hoja.cell_value(fila, 2) == rfc:
             # Tomar el municipio
@@ -114,8 +115,12 @@ def buscar_rfc(settings: Settings, rfc: str) -> Dispersion:
                 # Romper el ciclo cuando se llega a la columna
                 if col_num > 236:
                     break
-            # Entregar la dispersion
-            return dispersion
+            # Acumular la dispersion en dispersiones
+            dispersiones.append(dispersion)
 
-    # Si no se encuentra el RFC, levantar excepcion
-    raise MyNoDataWarning(f"No se encontro el RFC {rfc}")
+    # Si no se encuentran dispersiones, levantar excepcion
+    if len(dispersiones) == 0:
+        raise MyNoDataWarning(f"No se encontro el RFC {rfc}")
+
+    # Entregar dispersiones
+    return dispersiones
