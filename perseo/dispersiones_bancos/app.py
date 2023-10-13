@@ -37,7 +37,7 @@ def buscar(rfc: str):
     rich.print(f"Centro de trabajo: [green]{dispersion.persona.centro_trabajo_clave}[/green]")
     rich.print(f"RFC:               [green]{dispersion.persona.rfc}[/green]")
     rich.print(f"Nombre:            [green]{dispersion.persona.nombre}[/green]")
-    rich.print(f"Municipio:         [green]{dispersion.persona.municipio}[/green]")
+    rich.print(f"Municipio:         [green]{dispersion.persona.municipio.nombre}[/green]")
     rich.print(f"Plaza:             [green]{dispersion.persona.plaza}[/green]")
     rich.print(f"Sexo:              [white]{dispersion.persona.sexo}[/white]")
     rich.print()
@@ -85,7 +85,7 @@ def guardar(rfc: str):
     ws.append(["Centro de trabajo", dispersion.persona.centro_trabajo_clave])
     ws.append(["RFC", dispersion.persona.rfc])
     ws.append(["Nombre", dispersion.persona.nombre])
-    ws.append(["Municipio", dispersion.persona.municipio])
+    ws.append(["Municipio", dispersion.persona.municipio.nombre])
     ws.append(["Plaza", dispersion.persona.plaza])
     ws.append(["Sexo", dispersion.persona.sexo])
 

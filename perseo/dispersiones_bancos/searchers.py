@@ -11,6 +11,7 @@ from lib.fechas import crear_clave_quincena
 from lib.safe_string import safe_rfc, safe_string
 from perseo.conceptos.loaders import load_conceptos
 from perseo.dispersiones_bancos.classes import Dispersion, PercepcionDeduccion
+from perseo.municipios.loaders import load_municipios
 from perseo.personas.classes import Persona
 
 
@@ -34,6 +35,9 @@ def buscar_rfc(settings: Settings, rfc: str) -> Dispersion:
     # Cargar los conceptos
     conceptos = load_conceptos()
 
+    # Cargar los municipios
+    municipios = load_municipios()
+
     # Abrir el archivo XLS con xlrd
     libro = xlrd.open_workbook(str(archivo))
 
@@ -45,12 +49,21 @@ def buscar_rfc(settings: Settings, rfc: str) -> Dispersion:
     persona = None
     for fila in range(hoja.nrows):
         if hoja.cell_value(fila, 2) == rfc:
+            # Tomar el municipio
+            municipio = None
+            for item in municipios:
+                if item.clave == int(hoja.cell_value(fila, 4)):
+                    municipio = item
+                    break
+            # Si no encuentra el municipio, levantar excepcion
+            if municipio is None:
+                raise MyNoDataWarning(f"No se encontro el municipio {hoja.cell_value(fila, 4)}")
             # Tomar los datos de la persona
             persona = Persona(
                 centro_trabajo_clave=hoja.cell_value(fila, 1),
                 rfc=hoja.cell_value(fila, 2),
                 nombre=hoja.cell_value(fila, 3),
-                municipio=int(hoja.cell_value(fila, 4)),
+                municipio=municipio,
                 plaza=hoja.cell_value(fila, 8),
                 sexo=hoja.cell_value(fila, 18),
             )

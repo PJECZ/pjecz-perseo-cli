@@ -3,6 +3,8 @@ Perseo - Personas - Classes
 """
 from pydantic import BaseModel
 
+from perseo.municipios.classes import Municipio
+
 
 class Persona(BaseModel):
     """Persona"""
@@ -10,6 +12,6 @@ class Persona(BaseModel):
     centro_trabajo_clave: str
     rfc: str
     nombre: str
-    municipio: int
+    municipio: Municipio
     plaza: str
     sexo: str
