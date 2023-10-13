@@ -19,8 +19,8 @@ class Dispersion(BaseModel):
     """Dispersion"""
 
     persona: Persona
-    percepcion: int
-    deduccion: int
-    importe: int
+    percepcion: float
+    deduccion: float
+    importe: float
     num_cheque: int
-    percepcion_descuento: PercepcionDescuento
+    # percepcion_descuento: list(PercepcionDescuento) = []

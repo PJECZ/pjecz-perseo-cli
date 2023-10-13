@@ -9,10 +9,11 @@ from config.settings import Settings
 from lib.exceptions import MyFileNotFoundError, MyNoDataWarning, MyNotValidParamError
 from lib.fechas import crear_clave_quincena
 from lib.safe_string import safe_rfc
+from perseo.dispersiones_bancos.classes import Dispersion
 from perseo.personas.classes import Persona
 
 
-def buscar_rfc(settings: Settings, rfc: str) -> Persona:
+def buscar_rfc(settings: Settings, rfc: str) -> Dispersion:
     """Buscar un RFC"""
 
     # Validar RFC
@@ -36,6 +37,7 @@ def buscar_rfc(settings: Settings, rfc: str) -> Persona:
     hoja = libro.sheet_by_index(0)
 
     # Buscar el RFC en la hoja, donde la columna 2 (comienza en 0) es el RFC
+    dispersion = None
     persona = None
     for fila in range(hoja.nrows):
         if hoja.cell_value(fila, 2) == rfc:
@@ -47,7 +49,14 @@ def buscar_rfc(settings: Settings, rfc: str) -> Persona:
                 plaza=hoja.cell_value(fila, 8),
                 sexo=hoja.cell_value(fila, 18),
             )
-            return persona
+            dispersion = Dispersion(
+                persona=persona,
+                percepcion=int(hoja.cell_value(fila, 12)) / 100.0,
+                deduccion=int(hoja.cell_value(fila, 13)) / 100.0,
+                importe=int(hoja.cell_value(fila, 14)) / 100.0,
+                num_cheque=int(hoja.cell_value(fila, 15)),
+            )
+            return dispersion
 
     # Si no se encuentra el RFC, levantar excepcion
     raise MyNoDataWarning(f"No se encontro el RFC {rfc}")
