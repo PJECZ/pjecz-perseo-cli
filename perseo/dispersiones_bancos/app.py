@@ -7,6 +7,7 @@ from openpyxl import Workbook
 
 from config.settings import get_settings
 from lib.exceptions import MyAnyError
+from perseo.dispersiones_bancos.loaders import leer
 from perseo.dispersiones_bancos.searchers import buscar_rfc
 
 app = typer.Typer()
@@ -74,7 +75,67 @@ def guardar(rfc: str):
 
     # Buscar RFC
     try:
-        dispersion = buscar_rfc(settings=settings, rfc=rfc)
+        dispersiones = buscar_rfc(settings=settings, rfc=rfc)
+    except MyAnyError as error:
+        typer.secho(str(error), fg=typer.colors.RED)
+        raise typer.Exit()
+
+    # Crear el libro
+    wb = Workbook()
+
+    # Bucle para iterar las dispersiones
+    hoja_contador = 1
+    for dispersion in dispersiones:
+        # Crear una hoja nueva
+        ws = wb.create_sheet(title=f"Hoja {hoja_contador}")
+
+        # Tomar el RFC de la persona, va a ser el nombre del archivo que se guardara
+        rfc = dispersion.persona.rfc
+
+        # Escribir los datos de la persona
+        ws.append(["Centro de trabajo", dispersion.persona.centro_trabajo_clave])
+        ws.append(["RFC", rfc])
+        ws.append(["Nombre", dispersion.persona.nombre])
+        ws.append(["Municipio", dispersion.persona.municipio.nombre])
+        ws.append(["Plaza", dispersion.persona.plaza])
+        ws.append(["Sexo", dispersion.persona.sexo])
+
+        # Escribir las percepciones
+        ws.append(["Percepciones"])
+        for percepcion in dispersion.percepciones_deducciones:
+            if percepcion.concepto.p_d.value == "P":
+                ws.append([percepcion.concepto.descripcion, percepcion.importe])
+
+        # Escribir las deducciones
+        ws.append(["Deducciones"])
+        for percepcion in dispersion.percepciones_deducciones:
+            if percepcion.concepto.p_d.value == "D":
+                ws.append([percepcion.concepto.descripcion, percepcion.importe])
+
+        # Escribir las cantidades finales
+        ws.append(["Percepcion", dispersion.percepcion])
+        ws.append(["Deduccion", dispersion.deduccion])
+        ws.append(["Importe", dispersion.importe])
+        ws.append(["No. Cheque", dispersion.num_cheque])
+
+        # Incrementar el contador de hojas
+        hoja_contador += 1
+
+    # Guardar el archivo, con el nombre del archivo con el RFC
+    wb.save(f"{rfc}.xlsx")
+
+
+@app.command()
+def generar():
+    """Crear layout para el banco"""
+    rich.print("Crear layout para el banco")
+
+    # Obtener configuracion
+    settings = get_settings()
+
+    # Leer todo el archivo de explotacion
+    try:
+        dispersiones = leer(settings=settings)
     except MyAnyError as error:
         typer.secho(str(error), fg=typer.colors.RED)
         raise typer.Exit()
@@ -83,37 +144,48 @@ def guardar(rfc: str):
     wb = Workbook()
     ws = wb.active
 
-    # Escribir los datos de la persona
-    ws.append(["Centro de trabajo", dispersion.persona.centro_trabajo_clave])
-    ws.append(["RFC", dispersion.persona.rfc])
-    ws.append(["Nombre", dispersion.persona.nombre])
-    ws.append(["Municipio", dispersion.persona.municipio.nombre])
-    ws.append(["Plaza", dispersion.persona.plaza])
-    ws.append(["Sexo", dispersion.persona.sexo])
+    # Escribir los encabezados en el primer renglon
+    ws.append(
+        [
+            "Centro de trabajo",
+            "RFC",
+            "Nombre",
+            "Municipio",
+            "Plaza",
+            "Sexo",
+            "Percepcion",
+            "Deduccion",
+            "Importe",
+            "No. Cheque",
+        ]
+    )
 
-    # Escribir las percepciones
-    ws.append(["Percepciones"])
-    for percepcion in dispersion.percepciones_deducciones:
-        if percepcion.concepto.p_d.value == "P":
-            ws.append([percepcion.concepto.descripcion, percepcion.importe])
+    # Bucle para iterar las dispersiones
+    for dispersion in dispersiones:
+        # Si uno de los conceptos es "ME", se salta la dispersion
+        tiene_monedero_electronico = False
+        for percepcion_deduccion in dispersion.percepciones_deducciones:
+            if percepcion_deduccion.concepto.concepto == "ME":
+                tiene_monedero_electronico = True
+                break
+        if tiene_monedero_electronico:
+            continue
 
-    # Escribir las deducciones
-    ws.append(["Deducciones"])
-    for percepcion in dispersion.percepciones_deducciones:
-        if percepcion.concepto.p_d.value == "D":
-            ws.append([percepcion.concepto.descripcion, percepcion.importe])
+        # Escribir los datos de la persona
+        ws.append(
+            [
+                dispersion.persona.centro_trabajo_clave,
+                dispersion.persona.rfc,
+                dispersion.persona.nombre,
+                dispersion.persona.municipio.nombre,
+                dispersion.persona.plaza,
+                dispersion.persona.sexo,
+                dispersion.percepcion,
+                dispersion.deduccion,
+                dispersion.importe,
+                dispersion.num_cheque,
+            ]
+        )
 
-    # Escribir las cantidades finales
-    ws.append(["Percepcion", dispersion.percepcion])
-    ws.append(["Deduccion", dispersion.deduccion])
-    ws.append(["Importe", dispersion.importe])
-    ws.append(["No. Cheque", dispersion.num_cheque])
-
-    # Guardar el archivo, con el nombre del archivo con el RFC
-    wb.save(f"{dispersion.persona.rfc}.xlsx")
-
-
-@app.command()
-def generar():
-    """Crear layout para el banco"""
-    rich.print("Crear layout para el banco")
+    # Guardar el archivo, con el nombre TODOS.xlsx
+    wb.save("bancos.xlsx")

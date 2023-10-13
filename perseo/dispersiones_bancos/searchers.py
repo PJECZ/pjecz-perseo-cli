@@ -101,7 +101,7 @@ def buscar_rfc(settings: Settings, rfc: str) -> list[Dispersion]:
                 # Si no encuentra el concepto, levantar excepcion
                 if concepto is None:
                     raise MyNoDataWarning(f"No se encontro el concepto {tipo}{conc}")
-                # Acumular la percepcion o el descuento en dispersion
+                # Acumular la percepcion o la deduccion en dispersion
                 dispersion.percepciones_deducciones.append(
                     PercepcionDeduccion(
                         concepto=concepto,

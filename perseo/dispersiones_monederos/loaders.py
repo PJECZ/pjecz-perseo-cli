@@ -1,5 +1,5 @@
 """
-Perseo - Dispersiones Bancos - Loaders
+Perseo - Dispersiones Monederos - Loaders
 """
 from pathlib import Path
 
