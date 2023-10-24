@@ -25,10 +25,10 @@ def buscar_rfc(settings: Settings, rfc: str) -> list[Dispersion]:
         raise MyNotValidParamError(str(error)) from error
 
     # Crear clave de quincena
-    clave_quincena = crear_clave_quincena(settings.fecha)
+    clave_quincena = crear_clave_quincena(settings.FECHA)
 
     # Validar si existe el archivo
-    archivo = Path(settings.explotacion_base_dir, clave_quincena, "NominaFmt2.XLS")
+    archivo = Path(settings.EXPLOTACION_BASE_DIR, clave_quincena, "NominaFmt2.XLS")
     if not archivo.exists():
         raise MyFileNotFoundError(f"No existe el archivo {str(archivo)}")
 

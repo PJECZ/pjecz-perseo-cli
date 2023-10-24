@@ -14,12 +14,6 @@ app = typer.Typer()
 
 
 @app.command()
-def mostrar():
-    """Mostrar dispersiones bancarias"""
-    rich.print("Mostrar dispersiones bancarias")
-
-
-@app.command()
 def buscar(rfc: str):
     """Buscar un RFC"""
     rich.print("Buscar un RFC")
