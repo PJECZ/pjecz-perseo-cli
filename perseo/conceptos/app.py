@@ -14,7 +14,7 @@ app = typer.Typer()
 
 @app.command()
 def alimentar():
-    """Alimentar conceptos"""
+    """Alimentar conceptos a la base de datos"""
     rich.print("Alimentar conceptos en la base de datos")
 
     # Obtener configuracion
