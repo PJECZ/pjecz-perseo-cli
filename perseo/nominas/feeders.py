@@ -1,6 +1,8 @@
 """
 Perseo - Nominas - Feeders
 """
+import logging
+
 from sqlalchemy import Column, ForeignKey, Integer, Numeric, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -12,6 +14,13 @@ from lib.universal_mixin import UniversalMixin
 from perseo.nominas.classes import Nomina
 
 Base = declarative_base()
+
+bitacora = logging.getLogger(__name__)
+bitacora.setLevel(logging.INFO)
+formato = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+empunadura = logging.FileHandler("nominas.log")
+empunadura.setFormatter(formato)
+bitacora.addHandler(empunadura)
 
 
 class CentroTrabajo(Base, UniversalMixin):
@@ -118,11 +127,16 @@ def feed_nominas(settings: Settings, nominas: list[Nomina]) -> int:
     # Cargar sesion de la base de datos
     session = get_session(settings)
 
+    # Iniciar listado de conceptos que no existen
+    conceptos_no_existentes = []
+
     # Bucle por las nominas
     for nomina in nominas:
         # Revisar si el Concepto existe, de lo contrario SE OMITE
         concepto = session.query(Concepto).filter_by(clave=nomina.concepto_clave).first()
         if concepto is None:
+            if nomina.concepto_clave not in conceptos_no_existentes:
+                conceptos_no_existentes.append(nomina.concepto_clave)
             continue
 
         # Revisar si el Centro de Trabajo existe, de lo contrario insertarlo
@@ -130,6 +144,7 @@ def feed_nominas(settings: Settings, nominas: list[Nomina]) -> int:
         if centro_trabajo is None:
             centro_trabajo = CentroTrabajo(clave=nomina.centro_trabajo_clave, descripcion="ND")
             session.add(centro_trabajo)
+            bitacora.info("Centro de Trabajo %s insertado", nomina.centro_trabajo_clave)
 
         # Revisar si la Persona existe, de lo contrario insertarlo
         persona = session.query(Persona).filter_by(rfc=nomina.rfc).first()
@@ -141,12 +156,14 @@ def feed_nominas(settings: Settings, nominas: list[Nomina]) -> int:
                 apellido_segundo=nomina.apellido_segundo,
             )
             session.add(persona)
+            bitacora.info("Persona %s insertada", nomina.rfc)
 
         # Revisar si la Plaza existe, de lo contrario insertarla
         plaza = session.query(Plaza).filter_by(clave=nomina.plaza_clave).first()
         if plaza is None:
             plaza = Plaza(clave=nomina.plaza_clave, descripcion="ND")
             session.add(plaza)
+            bitacora.info("Plaza %s insertada", nomina.plaza_clave)
 
         # Definir Quincena
         quincena = crear_clave_quincena(settings.FECHA)
@@ -166,9 +183,20 @@ def feed_nominas(settings: Settings, nominas: list[Nomina]) -> int:
         # Incrementar contador
         contador += 1
 
+        # Agregar al log una linea cada vez que el contador sea multiplo de 100
+        if contador % 100 == 0:
+            bitacora.info("Van %d nominas alimentadas", contador)
+
     # Cerrar la sesion para que se carguen los datos
     session.commit()
     session.close()
+
+    # Si hubo conceptos que no existen, se agregan al log
+    if len(conceptos_no_existentes) > 0:
+        bitacora.warning("Conceptos no existentes: %s", ",".join(conceptos_no_existentes))
+
+    # Agregar al log un mensaje con la cantidad de nominas alimentadas
+    bitacora.info("Terminado con %d nominas alimentadas", contador)
 
     # Terminar
     return contador

@@ -23,13 +23,13 @@ def alimentar():
     # Alimentar conceptos
     try:
         conceptos = load_conceptos()
-        feed_conceptos(settings, conceptos)
+        cantidad = feed_conceptos(settings, conceptos)
     except MyAnyError as error:
         typer.secho(str(error), fg=typer.colors.RED)
         raise typer.Exit()
 
     # Mostrar mensaje de exito
-    typer.secho("Conceptos alimentados", fg=typer.colors.GREEN)
+    typer.secho(f"Conceptos alimentados: {cantidad}", fg=typer.colors.GREEN)
 
 
 @app.command()

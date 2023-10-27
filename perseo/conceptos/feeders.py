@@ -27,8 +27,11 @@ class ConceptoDB(Base, UniversalMixin):
     descripcion = Column(String(256), nullable=False)
 
 
-def feed_conceptos(settings: Settings, conceptos: list[Concepto]) -> None:
+def feed_conceptos(settings: Settings, conceptos: list[Concepto]) -> int:
     """Alimentar conceptos"""
+
+    # Inicializar contador en cero
+    contador = 0
 
     # Cargar el engine de la base de datos para ejecutar comandos SQL
     engine = get_engine(settings)
@@ -49,9 +52,12 @@ def feed_conceptos(settings: Settings, conceptos: list[Concepto]) -> None:
             )
         )
 
+        # Incrementar contador
+        contador += 1
+
     # Cerrar la sesion para que se carguen los datos
     session.commit()
     session.close()
 
     # Terminar
-    return None
+    return contador
