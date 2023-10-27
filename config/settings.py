@@ -1,5 +1,5 @@
 """
-Config - Settings  /home/guivaloz/Downloads/NOMINAS
+Config - Settings
 """
 from datetime import date
 from functools import lru_cache
@@ -12,8 +12,15 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    explotacion_base_dir: str
-    fecha: date = date.today()
+    DB_HOST: str
+    DB_PORT: str
+    DB_NAME: str
+    DB_USER: str
+    DB_PASS: str
+    EXPLOTACION_BASE_DIR: str
+    FECHA: date = date.today()
+    SALT: str
+    SQLALCHEMY_DATABASE_URI: str
 
 
 @lru_cache()

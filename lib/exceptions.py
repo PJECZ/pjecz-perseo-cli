@@ -1,5 +1,5 @@
 """
-Lib - Exceptions
+Exceptions
 """
 
 

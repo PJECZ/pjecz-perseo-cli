@@ -1,5 +1,5 @@
 """
-Lib - Fechas
+Fechas
 """
 from datetime import date
 
